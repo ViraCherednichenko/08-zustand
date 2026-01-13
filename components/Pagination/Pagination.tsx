@@ -3,9 +3,9 @@
 import ReactPaginate from "react-paginate";
 
 export interface PaginationProps {
-  pageCount: number;              // скільки всього сторінок
-  forcePage: number;              // поточна сторінка (0-based для ReactPaginate)
-  onPageChange: (page: number) => void; // повертаємо 0-based сторінку
+  pageCount: number;              
+  forcePage: number;              
+  onPageChange: (page: number) => void; 
 }
 
 export default function Pagination({

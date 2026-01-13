@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 
 import NoteList from "@/components/NoteList/NoteList";
@@ -24,17 +24,25 @@ export default function NotesClient({
 }: Props) {
   const [page, setPage] = useState<number>(initialPage);
   const [search, setSearch] = useState<string>(initialSearch);
+  const [debouncedSearch, setDebouncedSearch] = useState<string>(initialSearch);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
+  useEffect(() => {
+    const id = window.setTimeout(() => {
+      setDebouncedSearch(search);
+    }, 400);
+
+    return () => window.clearTimeout(id);
+  }, [search]);
+
   const queryKey = useMemo(
-    () => ["notes", { page, perPage: initialPerPage, search }],
-    [page, initialPerPage, search]
+    () => ["notes", { page, perPage: initialPerPage, search: debouncedSearch }],
+    [page, initialPerPage, debouncedSearch]
   );
 
   const { data, isLoading, isError } = useQuery({
     queryKey,
-    queryFn: () => fetchNotes(page, initialPerPage, search),
-    // щоб не було “мерехтіння” при переході між сторінками
+    queryFn: () => fetchNotes(page, initialPerPage, debouncedSearch),
     placeholderData: (prev) => prev,
   });
 
@@ -46,7 +54,6 @@ export default function NotesClient({
   };
 
   const handlePageChange = (selectedPage0: number) => {
-    // ReactPaginate працює з 0-based, а наш API/стан — 1-based
     setPage(selectedPage0 + 1);
   };
 
@@ -59,7 +66,6 @@ export default function NotesClient({
 
       <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
         <SearchBox value={search} onChange={handleSearchChange} />
-
         <button type="button" onClick={openModal}>
           Add note
         </button>

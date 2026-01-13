@@ -19,7 +19,7 @@ export default function Modal({ isOpen, onClose, children }: ModalProps) {
 
     document.addEventListener("keydown", handleKeyDown);
 
-    // блокуємо скрол сторінки під час відкритої модалки
+    
     const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
 
@@ -32,7 +32,6 @@ export default function Modal({ isOpen, onClose, children }: ModalProps) {
   if (!isOpen) return null;
 
   const handleBackdropClick = (e: MouseEvent<HTMLDivElement>) => {
-    // закриваємо тільки якщо клік саме по бекдропу, а не по контенту
     if (e.target === e.currentTarget) onClose();
   };
 

@@ -4,14 +4,14 @@ import { useEffect, useState } from "react";
 
 export interface SearchBoxProps {
   value: string;
-  onChange: (value: string) => void; // сюди віддаємо вже “дебаунсене” значення
-  delay?: number; // debounce у мс (за замовчуванням 400)
+  onChange: (value: string) => void;
+  delay?: number; 
 }
 
 export default function SearchBox({ value, onChange, delay = 400 }: SearchBoxProps) {
   const [localValue, setLocalValue] = useState<string>(value);
 
-  // синхронізуємо localValue, якщо value зміниться ззовні
+  
   useEffect(() => {
     setLocalValue(value);
   }, [value]);

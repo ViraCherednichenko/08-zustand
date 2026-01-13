@@ -9,7 +9,7 @@ import { createNote } from "@/lib/api";
 
 export interface NoteFormValues {
   title: string;
-  content: string;
+  content?: string;
   tag: NoteTag;
 }
 
@@ -20,14 +20,14 @@ export interface NoteFormProps {
 const validationSchema = Yup.object({
   title: Yup.string()
     .trim()
-    .min(2, "Min 2 characters")
+    .min(3, "Min 3 characters")
     .max(50, "Max 50 characters")
     .required("Title is required"),
+  
   content: Yup.string()
     .trim()
-    .min(2, "Min 2 characters")
     .max(500, "Max 500 characters")
-    .required("Content is required"),
+    .notRequired(),
   tag: Yup.mixed<NoteTag>().required("Tag is required"),
 });
 
@@ -35,7 +35,13 @@ export default function NoteForm({ onClose }: NoteFormProps) {
   const queryClient = useQueryClient();
 
   const mutation = useMutation({
-    mutationFn: (values: NoteFormValues) => createNote(values),
+    mutationFn: (values: NoteFormValues) =>
+      createNote({
+        title: values.title,
+      
+        content: values.content ?? "",
+        tag: values.tag,
+      }),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["notes"] });
       onClose();
@@ -96,7 +102,7 @@ export default function NoteForm({ onClose }: NoteFormProps) {
 
           <div style={{ display: "flex", gap: 8, marginTop: 12 }}>
             <button type="submit" disabled={!isValid || mutation.isPending}>
-              {mutation.isPending ? "Saving..." : "Save"}
+              {mutation.isPending ? "Creating..." : "Create note"}
             </button>
 
             <button type="button" onClick={onClose}>
