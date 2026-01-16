@@ -11,7 +11,13 @@ export default async function FilteredNotesPage({ params }: Props) {
   const slug = params.tag?.[0] ?? "all";
   const tag = slug === "all" ? undefined : slug;
 
-  const notes = await fetchNotes(tag);
+  // ⬇️ ВАЖЛИВО: правильні аргументи
+  const data = await fetchNotes(
+    1,        // page
+    12,       // perPage (або те число, яке ти вже використовуєш у проєкті)
+    undefined,
+    tag
+  );
 
-  return <NoteList notes={notes} />;
+  return <NoteList notes={data.notes} />;
 }

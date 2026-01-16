@@ -1,19 +1,14 @@
-import { fetchNoteById } from "@/lib/api";
-import Modal from "@/components/Modal/Modal";
 import NoteDetailsClient from "@/app/notes/[id]/NoteDetails.client";
+import ModalWrapper from "./ModalWrapper";
 
 type Props = {
-  params: {
-    id: string;
-  };
+  params: { id: string };
 };
 
-export default async function NoteModalPage({ params }: Props) {
-  const note = await fetchNoteById(params.id);
-
+export default function NoteModalPage({ params }: Props) {
   return (
-    <Modal>
-      <NoteDetailsClient note={note} />
-    </Modal>
+    <ModalWrapper>
+      <NoteDetailsClient id={params.id} />
+    </ModalWrapper>
   );
 }

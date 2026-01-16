@@ -1,15 +1,22 @@
 "use client";
 
+import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
+
 import { fetchNoteById } from "@/lib/api";
 import css from "./NoteDetails.module.css";
-import Link from "next/link";
 
-export default function NoteDetailsClient() {
-  const { id } = useParams<{ id: string }>();
+type Props = {
+  id?: string;
+  backHref?: string; // щоб з модалки повертатись "назад" іншим способом, якщо треба
+};
 
-  const { data: note, isLoading, error } = useQuery({
+export default function NoteDetailsClient({ id: idProp, backHref }: Props) {
+  const params = useParams<{ id: string }>();
+  const id = idProp ?? params.id;
+
+  const { data: note, isLoading, isError } = useQuery({
     queryKey: ["note", id],
     queryFn: () => fetchNoteById(id),
     enabled: Boolean(id),
@@ -17,11 +24,13 @@ export default function NoteDetailsClient() {
   });
 
   if (isLoading) return <p>Loading, please wait...</p>;
-  if (error || !note) return <p>Something went wrong.</p>;
+  if (isError || !note) return <p>Something went wrong.</p>;
 
   return (
     <div className={css.container}>
-      <Link href="/notes">← Back to notes</Link>
+      {/* Якщо backHref передали — буде звичайний Link.
+          Якщо ні — можна просто не показувати "back" (в модалці закриття через overlay/esc). */}
+      {backHref ? <Link href={backHref}>← Back</Link> : null}
 
       <div className={css.item}>
         <div className={css.header}>
