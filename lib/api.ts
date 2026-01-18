@@ -26,6 +26,7 @@ export interface CreateNotePayload {
 }
 
 /* ================= API ================= */
+
 export async function fetchNotes(
   page: number,
   perPage: number,
@@ -44,9 +45,7 @@ export async function fetchNotes(
   return data;
 }
 
-export async function createNote(
-  payload: CreateNotePayload
-): Promise<Note> {
+export async function createNote(payload: CreateNotePayload): Promise<Note> {
   const { data } = await api.post<Note>("/notes", payload);
   return data;
 }

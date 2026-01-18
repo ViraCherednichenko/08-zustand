@@ -1,5 +1,6 @@
-import ModalRouteWrapper from "@/components/ModalRouteWrapper/ModalRouteWrapper";
+import { dehydrate, HydrationBoundary, QueryClient } from "@tanstack/react-query";
 import NotePreviewClient from "./NotePreview.client";
+import { fetchNoteById } from "@/lib/api";
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -8,9 +9,16 @@ type Props = {
 export default async function NoteModalPage({ params }: Props) {
   const { id } = await params;
 
+  const queryClient = new QueryClient();
+
+ await queryClient.prefetchQuery({
+  queryKey: ["note", id],
+  queryFn: () => fetchNoteById(id),
+});
+
   return (
-    <ModalRouteWrapper>
+    <HydrationBoundary state={dehydrate(queryClient)}>
       <NotePreviewClient id={id} />
-    </ModalRouteWrapper>
+    </HydrationBoundary>
   );
 }

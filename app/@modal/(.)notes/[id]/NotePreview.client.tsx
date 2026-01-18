@@ -1,24 +1,46 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
+import Modal from "@/components/Modal/Modal";
 import { fetchNoteById } from "@/lib/api";
-import NoteDetailsClient from "@/app/notes/[id]/NoteDetails.client";
 
 type Props = {
   id: string;
 };
 
 export default function NotePreviewClient({ id }: Props) {
-  const { isLoading, isError } = useQuery({
+  const router = useRouter();
+
+  const { data, isLoading, isError, error } = useQuery({
     queryKey: ["note", id],
     queryFn: () => fetchNoteById(id),
-    enabled: Boolean(id),
     refetchOnMount: false,
   });
 
-  if (isLoading) return <p>Loading, please wait...</p>;
-  if (isError) return <p>Something went wrong.</p>;
+  const handleClose = () => router.back();
 
-  // NoteDetailsClient сам дістане note з кешу (бо queryKey той самий)
-  return <NoteDetailsClient id={id} />;
+  return (
+    <Modal isOpen={true} onClose={handleClose}>
+      <button type="button" onClick={handleClose} aria-label="Close modal">
+        Close
+      </button>
+
+      {isLoading && <p>Loading...</p>}
+
+      {isError && (
+        <p>
+          Error: {error instanceof Error ? error.message : "Unknown error"}
+        </p>
+      )}
+
+      {!isLoading && !isError && data && (
+        <div>
+          <h2>{data.title}</h2>
+          {data.content && <p>{data.content}</p>}
+          <p>Tag: {data.tag}</p>
+        </div>
+      )}
+    </Modal>
+  );
 }

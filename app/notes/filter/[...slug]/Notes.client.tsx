@@ -1,22 +1,66 @@
 "use client";
 
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+
 import { fetchNotes } from "@/lib/api";
+import { useDebounce } from "@/hooks/useDebounce";
+
 import NoteList from "@/components/NoteList/NoteList";
+import SearchBox from "@/components/SearchBox/SearchBox";
+import Pagination from "@/components/Pagination/Pagination";
+import Modal from "@/components/Modal/Modal";
+import NoteForm from "@/components/NoteForm/NoteForm";
 
 type Props = {
-  tag?: string;
+  tag: string;
 };
 
+const PER_PAGE = 12;
+
 export default function NotesClient({ tag }: Props) {
-  const { data, isLoading, isError } = useQuery({
-    queryKey: ["notes", { page: 1, perPage: 12, tag }],
-    queryFn: () => fetchNotes(1, 12, undefined, tag),
-    refetchOnMount: false,
-  });
+  const [page, setPage] = useState(1);
+  const [search, setSearch] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
-  if (isLoading) return <p>Loading, please wait...</p>;
-  if (isError || !data) return <p>Something went wrong.</p>;
+  const debouncedSearch = useDebounce(search, 500);
 
-  return <NoteList notes={data.notes} />;
+ const { data } = useQuery({
+  queryKey: ["notes", tag, page, debouncedSearch],
+  queryFn: () => fetchNotes(page, PER_PAGE, debouncedSearch, tag),
+  placeholderData: (prev) => prev,
+});
+
+
+  const handleSearchChange = (value: string) => {
+    setSearch(value);
+    setPage(1);
+  };
+
+  const handleOpenModal = () => setIsModalOpen(true);
+  const handleCloseModal = () => setIsModalOpen(false);
+
+  return (
+    <>
+      <SearchBox value={search} onChange={handleSearchChange} />
+
+      <button type="button" onClick={handleOpenModal}>
+        Add note
+      </button>
+
+      <NoteList notes={data?.notes ?? []} />
+
+      
+<Pagination
+  pageCount={data?.totalPages ?? 1}
+  forcePage={page - 1}
+  onPageChange={(selectedPage) => setPage(selectedPage + 1)}
+/>
+      {isModalOpen && (
+        <Modal isOpen={true} onClose={handleCloseModal}>
+          <NoteForm onClose={handleCloseModal} />
+        </Modal>
+      )}
+    </>
+  );
 }
