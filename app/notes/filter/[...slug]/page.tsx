@@ -1,13 +1,15 @@
 import type { Metadata } from "next";
+import NotesClient from "../../NotesClient";
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
 
 type Props = {
-  params: { slug?: string[] };
+  params: Promise<{ slug?: string[] }>;
 };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const filter = params.slug?.join("/") ?? "all";
+  const { slug } = await params;
+  const filter = slug?.[0] ?? "all";
 
   const title = `Notes filter: ${filter} | NoteHub`;
   const description = `Browse notes in NoteHub filtered by: ${filter}.`;
@@ -24,7 +26,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default function FilterPage() {
-  // твоя SSR/CSR логіка тут (як у завданні)
-  return null;
+export default async function FilterPage({ params }: Props) {
+  const { slug } = await params;
+  const tag = slug?.[0] ?? "all";
+
+  return <NotesClient tag={tag} />;
 }
