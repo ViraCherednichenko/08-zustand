@@ -1,5 +1,12 @@
 import axios from "axios";
 
+const BASE_URL = "https://notehub-public.goit.study/api";
+
+const token = process.env.NEXT_PUBLIC_NOTEHUB_TOKEN;
+
 export const apiClient = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL,
+  baseURL: BASE_URL,
+  headers: {
+    Authorization: token ? `Bearer ${token}` : "",
+  },
 });
