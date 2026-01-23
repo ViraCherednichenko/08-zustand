@@ -1,15 +1,23 @@
 import { apiClient } from "./client";
 import type { NoteTag } from "@/types/note";
 
-export async function fetchNotes(
-  page: number,
-  perPage: number,
-  search: string,
-  tag: string
-) {
+type FetchNotesParams = {
+  page: number;
+  perPage?: number;
+  search?: string;
+  tag?: NoteTag;
+};
+
+export async function fetchNotes({
+  page,
+  perPage = 12,
+  search = "",
+  tag,
+}: FetchNotesParams) {
   const { data } = await apiClient.get("/notes", {
     params: { page, perPage, search, tag },
   });
+
   return data;
 }
 
