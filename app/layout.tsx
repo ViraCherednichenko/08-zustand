@@ -28,23 +28,13 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-  sidebar,
-  modal,
-}: Readonly<{
-  children: React.ReactNode;
-  sidebar: React.ReactNode;
-  modal: React.ReactNode;
-}>) {
+}: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="uk" className={roboto.variable}>
       <body>
         <Providers>
           <Header />
-          {/* parallel route slot */}
-          {sidebar}
           {children}
-          {/* modal parallel route slot */}
-          {modal}
         </Providers>
       </body>
     </html>
